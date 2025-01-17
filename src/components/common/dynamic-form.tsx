@@ -22,6 +22,18 @@ interface DynamicFormProps {
   config: FormConfig;
 }
 
+export function DynamicFormFallback() {
+  return (
+    <div className="mx-auto w-full max-w-4xl space-y-6 p-4">
+      <Card className="h-full min-h-[500px] w-[600px]">
+        <CardHeader>
+          <CardTitle>Loading...</CardTitle>
+        </CardHeader>
+      </Card>
+    </div>
+  );
+}
+
 export function DynamicForm({ config }: DynamicFormProps) {
   const [persistedData, setPersistedData] = useLocalStorage<FormData>(
     KEYS.USER_DATA,

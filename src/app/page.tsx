@@ -1,16 +1,32 @@
-import Link from "next/link";
+"use client";
 
-export default async function Home() {
+import Link from "next/link";
+import { api } from "@/trpc/react";
+import { Suspense } from "react";
+
+const Forms = () => {
+  const [forms] = api.form.getForms.useSuspenseQuery();
+
+  return (
+    <>
+      {forms.map((form) => (
+        <Link href={`/forms/${form.name}`} key={form.id} className="underline">
+          {form.name}
+        </Link>
+      ))}
+    </>
+  );
+};
+
+export default function Home() {
   return (
     <main>
       <div>
         <ul>
           <h2 className="text-2xl font-bold">Available Forms</h2>
-          <li>
-            <Link href="/sf-parking-form" className="underline">
-              SF Parking Form
-            </Link>
-          </li>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Forms />
+          </Suspense>
         </ul>
       </div>
     </main>

@@ -4,28 +4,27 @@ const BROWSERBASE_API_KEY = process.env.BROWSERBASE_API_KEY;
 const BROWSERBASE_PROJECT_ID = process.env.BROWSERBASE_PROJECT_ID;
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
-
-const userInfoSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  address: z.string(),
-  city: z.string(),
-  state: z.string(),
-  zip: z.string(),
-  liscensePlate: z.string(),
-  permanentPlate: z.boolean(),
-  make: z.string(),
-  model: z.string(),
-  year: z.string(),
-  color: z.string(),
-});
+import { TRPCError } from "@trpc/server";
 
 export const formRouter = createTRPCRouter({
-  fillForm: publicProcedure
-    .input(userInfoSchema)
-    .mutation(async ({ input }) => {
-        
+  getForms: publicProcedure.query(async ({ ctx }) => {
+    const forms = await ctx.db.query.forms.findMany();
+    return forms;
+  }),
+
+  getForm: publicProcedure
+    .input(
+      z.object({
+        name: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const form = await ctx.db.query.forms.findFirst({
+        where: (form, { eq }) => eq(form.name, input.name),
+      });
+      if (!form) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+      return form;
     }),
 });
