@@ -19,10 +19,11 @@ const UserInfo = {
   model: "Outback",
   year: "2020",
   color: "Blue",
+  vehicleType: "Passenger Vehicle",
+  applyingFor: "Other (Standard Business or Residential Parking Permit)",
 };
 
 const FillOutForm: FunctionComponent = () => {
-    
   const fillForm = api.form.fillForm.useMutation({
     onSuccess: () => {
       console.log("Form filled out successfully");
@@ -38,8 +39,8 @@ const FillOutForm: FunctionComponent = () => {
 
   return (
     <div>
-      <Button onClick={handleFillForm} disabled={fillForm.isLoading}>
-        {fillForm.isLoading ? "Filling Form..." : "Fill Out Form"}
+      <Button onClick={handleFillForm} disabled={fillForm.isPending}>
+        {fillForm.isPending ? "Filling Form..." : "Fill Out Form"}
       </Button>
     </div>
   );
