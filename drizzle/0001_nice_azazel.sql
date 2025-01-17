@@ -1,0 +1,1 @@
+ALTER TABLE "fastform_forms" ADD COLUMN "url" varchar;
