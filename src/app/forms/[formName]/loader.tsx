@@ -16,7 +16,9 @@ export async function FormPageLoader({
 
   return (
     <main className="py-8">
-      <DynamicForm config={{ title: form.title, fields: form.fields }} />
+      <DynamicForm
+        config={{ title: form.title, fields: form.fields, id: form.id }}
+      />
     </main>
   );
 }

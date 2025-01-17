@@ -11,23 +11,26 @@ if (!BROWSERBASE_API_KEY || !BROWSERBASE_PROJECT_ID) {
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 
-const userInfoSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  address: z.string(),
-  city: z.string(),
-  state: z.string(),
-  zip: z.string(),
-  liscensePlate: z.string(),
-  permanentPlate: z.boolean(),
-  vehicleType: z.string(),
-  make: z.string(),
-  model: z.string(),
-  year: z.string(),
-  color: z.string(),
-  doc1URL: z.string(),
+const formSubmitSchema = z.object({
+  formId: z.number(),
+  values: z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string().email(),
+    phoneNumber: z.string(),
+    address: z.string(),
+    city: z.string(),
+    state: z.string(),
+    zip: z.string(),
+    licensePlate: z.string(),
+    permanentPlate: z.string(),
+    make: z.string(),
+    model: z.string(),
+    year: z.string(),
+    color: z.string(),
+    carInsuranceUrl: z.string(),
+    dmvRegistrationUrl: z.string(),
+  }),
 });
 
 export const formRouter = createTRPCRouter({
@@ -56,8 +59,8 @@ export const formRouter = createTRPCRouter({
     }),
 
   fillForm: publicProcedure
-    .input(userInfoSchema)
-    .mutation(async ({ input }) => {
+    .input(formSubmitSchema)
+    .mutation(async ({ input: { formId, values } }) => {
       const stagehand = new Stagehand({
         apiKey: BROWSERBASE_API_KEY,
         projectId: BROWSERBASE_PROJECT_ID,
@@ -82,7 +85,7 @@ export const formRouter = createTRPCRouter({
 
         // Fill out personal information
         await page.act({
-          action: `Fill out the form with the following data: ${JSON.stringify(input)}`,
+          action: `Fill out the form with the following data: ${JSON.stringify(values)}`,
         });
 
         await new Promise((resolve) => setTimeout(resolve, 3000));

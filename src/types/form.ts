@@ -8,6 +8,7 @@ export interface FormField {
 export interface FormConfig {
   title: string;
   fields: FormField[];
+  id: number;
 }
 
 export type FormData = Record<string, string>;

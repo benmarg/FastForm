@@ -19,6 +19,7 @@ import { useLocalStorage } from "@/hooks/use-local-storage";
 import { KEYS } from "@/lib/constants/local-storage";
 import { UploadButton } from "@/components/ui/file-upload";
 import Image from "next/image";
+import { api } from "@/trpc/react";
 
 interface DynamicFormProps {
   config: FormConfig;
@@ -48,12 +49,21 @@ export function DynamicForm({ config }: DynamicFormProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const formSubmission = api.form.fillForm.useMutation({
+    onSuccess: () => {
+      console.log("Form filled out successfully");
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Basic form validation
     const isValid = config.fields.every((field) => {
-      if (field.required && !formData[field.name] && field.type !== "file") {
+      if (field.required && !formData[field.name]) {
         toast({
           title: "Validation Error",
           description: `${field.label} is required.`,
@@ -75,6 +85,11 @@ export function DynamicForm({ config }: DynamicFormProps) {
     toast({
       title: "Form Submitted",
       description: "Your data has been saved to your browser",
+    });
+
+    formSubmission.mutate({
+      formId: config.id,
+      values: formData as any,
     });
   };
 
@@ -110,9 +125,9 @@ export function DynamicForm({ config }: DynamicFormProps) {
       case "file": {
         return (
           <div className="flex items-center gap-2">
-            {formData[field.name] && (
+            {!!formData[field.name] && (
               <Image
-                src={formData[field.name]}
+                src={formData[field.name]!}
                 alt="uploaded image"
                 width={30}
                 height={30}
@@ -129,7 +144,6 @@ export function DynamicForm({ config }: DynamicFormProps) {
                   ...persistedData,
                   [field.name]: res[0]!.url,
                 });
-                alert("Upload Completed");
               }}
               onUploadError={(error: Error) => {
                 // Do something with the error.
@@ -160,8 +174,12 @@ export function DynamicForm({ config }: DynamicFormProps) {
             ))}
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
-              Submit
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={formSubmission.isPending}
+            >
+              {formSubmission.isPending ? "Submitting..." : "Submit"}
             </Button>
           </CardFooter>
         </form>
