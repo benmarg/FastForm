@@ -9,6 +9,7 @@ if (!BROWSERBASE_API_KEY || !BROWSERBASE_PROJECT_ID) {
 }
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { TRPCError } from "@trpc/server";
 
 const userInfoSchema = z.object({
   firstName: z.string(),
@@ -30,6 +31,30 @@ const userInfoSchema = z.object({
 });
 
 export const formRouter = createTRPCRouter({
+  getForms: publicProcedure.query(async ({ ctx }) => {
+    const forms = await ctx.db.query.forms.findMany();
+    return forms;
+  }),
+
+  getForm: publicProcedure
+    .input(
+      z.object({
+        name: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const form = await ctx.db.query.forms.findFirst({
+        where: (form, { eq }) => eq(form.name, input.name),
+      });
+      if (!form) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Form not found",
+        });
+      }
+      return form;
+    }),
+
   fillForm: publicProcedure
     .input(userInfoSchema)
     .mutation(async ({ input }) => {
@@ -54,8 +79,6 @@ export const formRouter = createTRPCRouter({
         await page.goto(
           "https://www.sfmta.com/services/permits/residential-parking-permit-application",
         );
-
-
 
         // Fill out personal information
         await page.act({
