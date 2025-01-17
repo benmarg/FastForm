@@ -2,7 +2,7 @@ import { DynamicForm } from "@/components/common/dynamic-form";
 import type { FormConfig } from "@/types/form";
 
 const formConfig: FormConfig = {
-  title: "User Information Form",
+  title: "SF Parking Form Information",
   fields: [
     { name: "firstName", label: "First Name", type: "text", required: true },
     { name: "lastName", label: "Last Name", type: "text", required: true },
@@ -38,7 +38,7 @@ const formConfig: FormConfig = {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-100 py-8">
+    <main className="py-8">
       <DynamicForm config={formConfig} />
     </main>
   );
