@@ -17,6 +17,8 @@ import { Checkbox } from "../ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { KEYS } from "@/lib/constants/local-storage";
+import { UploadButton } from "@/components/ui/file-upload";
+import Image from "next/image";
 
 interface DynamicFormProps {
   config: FormConfig;
@@ -51,7 +53,7 @@ export function DynamicForm({ config }: DynamicFormProps) {
 
     // Basic form validation
     const isValid = config.fields.every((field) => {
-      if (field.required && !formData[field.name]) {
+      if (field.required && !formData[field.name] && field.type !== "file") {
         toast({
           title: "Validation Error",
           description: `${field.label} is required.`,
@@ -105,6 +107,38 @@ export function DynamicForm({ config }: DynamicFormProps) {
             className="ml-1 mt-5"
           />
         );
+      case "file": {
+        return (
+          <div className="flex items-center gap-2">
+            {formData[field.name] && (
+              <Image
+                src={formData[field.name]}
+                alt="uploaded image"
+                width={30}
+                height={30}
+              />
+            )}
+            <UploadButton
+              endpoint="imageUploader"
+              onClientUploadComplete={(res) => {
+                // Do something with the response
+                console.log("Files: ", res);
+
+                handleInputChange(field.name, res[0]!.url);
+                setPersistedData({
+                  ...persistedData,
+                  [field.name]: res[0]!.url,
+                });
+                alert("Upload Completed");
+              }}
+              onUploadError={(error: Error) => {
+                // Do something with the error.
+                alert(`ERROR! ${error.message}`);
+              }}
+            />
+          </div>
+        );
+      }
       default:
         return <Input type={field.type} {...inputProps} />;
     }

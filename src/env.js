@@ -13,6 +13,7 @@ export const env = createEnv({
       .default("development"),
     BROWSERBASE_API_KEY: z.string(),
     BROWSERBASE_PROJECT_ID: z.string(),
+    UPLOADTHING_TOKEN: z.string(),
   },
 
   /**
@@ -33,6 +34,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     BROWSERBASE_API_KEY: process.env.BROWSERBASE_API_KEY,
     BROWSERBASE_PROJECT_ID: process.env.BROWSERBASE_PROJECT_ID,
+    UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
